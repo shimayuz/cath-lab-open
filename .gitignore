@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.tsbuildinfo
+tests/fixtures/
+.DS_Store
+
+# Local working files and secrets
+work/
+preview-*.png
+.env
+.env.*
+!.env.example
+*.zip
+*.ziptmp
