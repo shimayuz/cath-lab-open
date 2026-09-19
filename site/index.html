@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Explore coronary catheter movements with Cath Lab, an open-source 3D learning prototype. Free local simulation; Jev Pro planned at $5/month."
+    />
+    <meta name="theme-color" content="#087e83" />
+    <meta
+      property="og:title"
+      content="Cath Lab — Get a feel for the catheter"
+    />
+    <meta
+      property="og:description"
+      content="Explore coronary catheter movements in 3D. An open-source learning prototype built with GPT-6-Astra."
+    />
+    <title>Cath Lab — Get a feel for the catheter</title>
+    <link rel="icon" href="./mark.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./site.css" />
+    <script src="./site.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content / 本文へ</a>
+    <header>
+      <a class="brand" href="./"
+        ><img src="./mark.svg" alt="" width="38" height="38" />Cath Lab</a
+      >
+      <nav aria-label="Main">
+        <a href="#experience" data-ja="体験できること">Experience</a
+        ><a href="#pricing" data-ja="料金">Pricing</a
+        ><a href="https://github.com/shimayuz/cath-lab-open">GitHub</a
+        ><button id="language" aria-label="日本語に切り替える">日本語</button>
+      </nav>
+    </header>
+    <main id="main">
+      <section class="hero">
+        <div class="intro">
+          <p class="stage" data-ja="医学生・若手研修医のための体験教材">
+            A learning prototype for students & trainees
+          </p>
+          <h1 data-ja="その手で、\n心臓への一歩を。">
+            Get a feel for<br />the catheter.
+          </h1>
+          <p
+            class="lead"
+            data-ja="押す、引く、回す。カテーテルの動きと冠動脈への経路を、3Dで確かめる。"
+          >
+            Push, pull, rotate. Explore catheter movement and the route to the
+            coronary arteries in 3D.
+          </p>
+          <div class="actions">
+            <a
+              class="primary"
+              href="https://github.com/shimayuz/cath-lab-open#quick-start"
+              data-ja="無料版を入手"
+              >Get the free version</a
+            ><a class="secondary" href="#experience" data-ja="体験を知る"
+              >Explore the experience</a
+            >
+          </div>
+          <p class="small" data-ja="オープンソース。日本語・英語に対応。">
+            Open source. In English and Japanese.
+          </p>
+        </div>
+        <div class="exhibit">
+          <div class="exhibit-head">
+            <span data-ja="動きのイメージ">Movement sketch</span
+            ><span>JL / LCA</span>
+          </div>
+          <svg viewBox="0 0 560 470" role="img" aria-labelledby="diagram-title">
+            <title
+              id="diagram-title"
+              data-ja="カテーテルと冠動脈の模式図。臨床画像ではありません。"
+            >
+              Schematic catheter and coronary branches — not a clinical image
+            </title>
+            <defs>
+              <linearGradient id="artery" x2="1" y2="1">
+                <stop stop-color="#cf777f" />
+                <stop offset="1" stop-color="#a34459" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M244 25 C202 111 253 180 294 212 C344 264 321 345 273 370"
+              fill="none"
+              stroke="#e1b5b7"
+              stroke-width="96"
+              stroke-linecap="round"
+              opacity=".48"
+            />
+            <g
+              fill="none"
+              stroke="url(#artery)"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M286 265 C308 213 354 192 401 206 C451 222 448 273 464 296 M357 202 C327 267 345 325 369 397 M380 207 C401 272 412 313 428 354 M335 296 L301 340 M357 363 L332 396"
+                stroke-width="15"
+              />
+              <path
+                d="M241 322 C194 366 134 326 99 302 C72 280 62 253 70 224 M164 342 C164 383 189 412 205 432"
+                stroke-width="13"
+              />
+            </g>
+            <path
+              id="catheter"
+              d="M235 22 C210 115 255 178 280 224 C302 264 272 308 260 289 C251 275 271 264 286 265"
+              fill="none"
+              stroke="#327bd1"
+              stroke-width="10"
+              stroke-linecap="butt"
+            />
+            <path
+              d="M362 98 A35 35 0 1 0 380 152"
+              fill="none"
+              stroke="#087e83"
+              stroke-width="3"
+            />
+            <path
+              d="M375 140 L381 153 L367 154"
+              fill="none"
+              stroke="#087e83"
+              stroke-width="3"
+            />
+            <text x="401" y="135" fill="#356775" font-size="17" data-ja="回転">
+              Rotate
+            </text>
+          </svg>
+          <div class="exhibit-foot">
+            <span><i></i><span data-ja="カテーテル">Catheter</span></span
+            ><span data-ja="空間と操作の模式図"
+              >A sketch of space & movement</span
+            >
+          </div>
+        </div>
+      </section>
+      <section id="experience" class="experience">
+        <div>
+          <p class="section-kicker" data-ja="覚えるだけでなく、動かしてみる。">
+            Learn by exploring movement.
+          </p>
+          <h2 data-ja="動きと、その先を\nつなげて見る。">
+            Connect the movement<br />to what happens next.
+          </h2>
+        </div>
+        <div class="features">
+          <article>
+            <h3 data-ja="同じ動きを、2つの視点で">One movement. Two views.</h3>
+            <p
+              data-ja="3Dモデルと模式透視を切り替え。6〜10 inchの視野で、カテーテルと冠動脈の位置関係を確かめます。"
+            >
+              Switch between 3D and simulated fluoroscopy. Explore the
+              relationship between catheter and coronary arteries with a 6–10
+              inch field of view.
+            </p>
+          </article>
+          <article>
+            <h3 data-ja="左右の手で、操作を分ける">Give each hand a role.</h3>
+            <p
+              data-ja="カメラで手を検出。左手で押し引き、右手の親指と人差し指で回転。ボタン操作からも始められます。"
+            >
+              Use your camera: push and pull with the left hand, rotate with the
+              right thumb and index finger. Button controls are available too.
+            </p>
+          </article>
+          <article>
+            <h3 data-ja="操作を振り返る">Look back at your movements.</h3>
+            <p
+              data-ja="移動と回転の推移をグラフで確認し、CSV・JSONへ保存。測定値は操作の観察用で、臨床技能の採点ではありません。"
+            >
+              Review movement and rotation graphs, then export CSV or JSON.
+              These observations are not clinical skill scores.
+            </p>
+          </article>
+        </div>
+      </section>
+      <section class="pricing" id="pricing">
+        <div class="pricing-title">
+          <h2 data-ja="まず触れる。\n必要なら、Jevを。">
+            Start exploring.<br />Add Jev when ready.
+          </h2>
+          <p
+            data-ja="基本シミュレータは無料。運営側のJev APIは、有料プランの契約者限定です。"
+          >
+            The core simulator is free. Our hosted Jev API will be available
+            only to paid subscribers.
+          </p>
+        </div>
+        <div class="plans">
+          <article class="plan">
+            <h3>Free</h3>
+            <p class="price">$0</p>
+            <p data-ja="ローカルで、基本の操作を体験。">
+              Explore the core simulator locally.
+            </p>
+            <ul>
+              <li data-ja="3D・模式透視・造影シミュレーション">
+                3D, simulated fluoroscopy & contrast
+              </li>
+              <li data-ja="カメラによる手操作（MediaPipe）">
+                Camera hand controls with MediaPipe
+              </li>
+              <li data-ja="操作グラフ・CSV / JSON出力">
+                Movement graphs & CSV / JSON export
+              </li>
+              <li data-ja="日本語・英語／ソースコード公開">
+                English & Japanese / public source code
+              </li>
+            </ul>
+            <a
+              class="secondary"
+              href="https://github.com/shimayuz/cath-lab-open#quick-start"
+              data-ja="GitHubから入手"
+              >Get it on GitHub</a
+            >
+          </article>
+          <article class="plan pro">
+            <div class="plan-heading">
+              <h3>Jev Pro</h3>
+              <span class="availability" data-ja="販売準備中">Coming soon</span>
+            </div>
+            <p class="price">
+              $5<span data-ja=" / 月（USD）"> / month USD</span>
+            </p>
+            <p data-ja="手の動作分類を、Jevで補助。">
+              Add Jev-assisted hand intent classification.
+            </p>
+            <ul>
+              <li data-ja="Freeの全機能">Everything in Free</li>
+              <li data-ja="運営側のJev APIへのアクセス">
+                Access to our hosted Jev API
+              </li>
+              <li data-ja="押す・引く・回転・持ち直しの分類補助">
+                Push, pull, rotation & regrip classification
+              </li>
+              <li data-ja="月額サブスクリプション（Stripe）">
+                Monthly subscription through Stripe
+              </li>
+            </ul>
+            <p
+              class="status"
+              data-ja="まだ契約・請求はできません。販売開始後、有効な契約をサーバーで確認してからJevを利用できます。"
+            >
+              Subscriptions are not open yet. Once launched, the server will
+              verify an active subscription before enabling Jev.
+            </p>
+          </article>
+        </div>
+      </section>
+      <section class="notes">
+        <div>
+          <h2 data-ja="カメラ映像は、端末内で処理。">
+            Camera processing stays on your device.
+          </h2>
+          <p
+            data-ja="Jevをオンにした場合のみ、手の動きの要約をTypeSafeへ送ります。カメラ映像は送りません。Jevによる精度・反応速度の改善は、まだ実証されていません。"
+          >
+            Only when Jev is enabled are hand movement summaries sent to
+            TypeSafe. Camera frames are not sent. Improvements in accuracy or
+            response time from Jev have not yet been established.
+          </p>
+        </div>
+        <div>
+          <h2 data-ja="学びの入り口として。">An entry point to learning.</h2>
+          <p
+            data-ja="研究・開発段階の体験教材です。臨床判断や手技能力の証明には使用できません。現在の研究版の血管データには別の利用条件があり、有料版への使用可否を確認中です。"
+          >
+            This is a research and development prototype, not a tool for
+            clinical decisions or certification. The research version's vascular
+            data has separate terms; use in a paid service is under review.
+          </p>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <a class="brand" href="./">Cath Lab</a>
+      <p data-ja="GPT-6-Astraで開発。">Built with GPT-6-Astra.</p>
+      <a
+        href="https://github.com/shimayuz/cath-lab-open/issues"
+        data-ja="フィードバック"
+        >Feedback</a
+      ><a
+        href="https://github.com/shimayuz/cath-lab-open/blob/main/NOTICE.md"
+        data-ja="ライセンスと出典"
+        >Licenses & sources</a
+      >
+    </footer>
+  </body>
+</html>

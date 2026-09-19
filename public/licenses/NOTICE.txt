@@ -1,0 +1,5 @@
+Cath Lab uses React (MIT), Three.js (MIT), Lucide (ISC), and MediaPipe Tasks Vision (Apache-2.0).
+MediaPipe runtime: @mediapipe/tasks-vision 0.10.32.
+Hand Landmarker model source: https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task
+Noto Sans JP is served from Google Fonts under the SIL Open Font License.
+The coronary and ascending-aorta geometry derives from Vascular Model Repository 0066_H_CORO_H, under the research-and-development terms in VMR-LICENSE.txt. Peripheral access routes and the heart surface are schematic. See the repository NOTICE.md for attribution and restrictions.
