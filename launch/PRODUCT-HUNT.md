@@ -4,7 +4,7 @@ Status: prepared, not submitted. Publish after account login and final public UR
 
 Name: Cath Lab
 Tagline: Explore coronary catheter movements in 3D
-Website: https://cath-lab.pages.dev (verify assigned URL before use)
+Website: https://cath-lab.pages.dev (HTTP 200 and bilingual UI verified)
 Pricing at initial launch: Free. Jev Pro planned at USD $5/month; subscriptions not open.
 Suggested topics: Education, Open Source, Health & Fitness (select only available matching topics)
 
@@ -22,4 +22,4 @@ This is a learning prototype, not a clinically validated simulator or a tool for
 
 I would especially value feedback on whether the relationship between hand movement and catheter movement is understandable.
 
-Assets: original mark.svg; gallery images 1270×760 to be captured from the product page. Do not reuse private user videos, lecture slides, or unlicensed catheter reference images.
+Assets: product-hunt-icon.png (240×240); product-hunt-01.png and product-hunt-02.png (1270×760), captured from the live product page. These show the product page, not a recording of simulator use. Do not reuse private user videos, lecture slides, or unlicensed catheter reference images.
