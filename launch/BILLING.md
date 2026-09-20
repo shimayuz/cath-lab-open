@@ -24,7 +24,7 @@ The first paid Jev request timed out; a later full flow returned HTTP 200. Separ
 
 Requires Node 22.22+, Git LFS, a Cloudflare account and Stripe access. Keep all secrets in provider secret storage, never `VITE_` variables, chat or source control.
 
-1. Create a D1 database and set its ID in `wrangler.toml`; use your own `APP_ORIGIN` in both default and production vars. Set `BILLING_ENABLED=false` initially.
+1. Create a D1 database and set its ID in `wrangler.toml`; use your own `APP_ORIGIN` in both default and production vars. Set `BILLING_ENABLED=false` initially. Production must set `STRIPE_MODE=live`; isolated sandbox deployments must explicitly set `STRIPE_MODE=test`. Missing modes or a key/mode mismatch disable Checkout, paid Jev and webhook processing. Do not change modes on an existing customer database; keep sandbox data separate.
 2. Apply `npx wrangler d1 migrations apply cath-lab-accounts --remote`.
 3. Create a Stripe USD 5 monthly recurring price. This integration explicitly disables Managed Payments per Checkout session and uses ordinary Stripe Checkout, independent of the account default. Configure the Stripe customer portal. Create a signed webhook at `https://YOUR_ORIGIN/api/billing/webhook` for subscription and invoice lifecycle events, plus completed/expired Checkout events. Use separate test and live keys/prices/webhook secrets.
 4. Add Pages secrets: `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `STRIPE_WEBHOOK_SECRET`, `TYPESAFE_API_KEY`, using `npx wrangler pages secret put NAME --project-name cath-lab` or the dashboard.
@@ -38,7 +38,9 @@ npm run build:hosted
 npx wrangler pages deploy dist --project-name cath-lab --branch main
 ```
 
-Local hosted testing:
+For the concrete production rollout status and required inputs, see [PRODUCTION.md](PRODUCTION.md).
+
+Local hosted testing (billing-disabled by default):
 
 ```sh
 npx wrangler d1 migrations apply cath-lab-accounts --local
@@ -49,3 +51,5 @@ CATH_TEST_ORIGIN=http://localhost:4198 npx playwright test tests/e2e/hosted.spec
 ```
 
 Local ordinary development continues to use `npm run dev` and optional `.env.local` BYOK. Its loopback-only API must not be exposed as a hosted subscription gateway. Database migrations are append-only after deployment. Preserve D1 backups and recovery procedures; do not log tokens or recovery codes.
+
+For a billing-enabled sandbox run, explicitly override the inherited production mode with `--binding STRIPE_MODE=test` and use a separate local D1 persistence directory. The sandbox key and CLI webhook secret never belong in production.

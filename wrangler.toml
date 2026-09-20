@@ -4,6 +4,7 @@ compatibility_date = "2026-09-19"
 compatibility_flags = ["nodejs_compat"]
 
 [vars]
+STRIPE_MODE = "live"
 APP_ORIGIN = "https://cath-lab.pages.dev"
 BILLING_ENABLED = "false"
 JEV_MONTHLY_LIMIT = "50000"
@@ -15,6 +16,7 @@ database_id = "284f0330-6586-4527-90db-1c84f0cdc17f"
 migrations_dir = "migrations"
 
 [env.production.vars]
+STRIPE_MODE = "live"
 APP_ORIGIN = "https://cath-lab.pages.dev"
 BILLING_ENABLED = "false"
 JEV_MONTHLY_LIMIT = "50000"

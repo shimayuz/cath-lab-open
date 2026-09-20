@@ -10,6 +10,7 @@ import {
   handleHostedApi,
   reserveJevUsage,
   coordinator,
+  billingReady,
 } from "../server/hosted";
 import type { HostedEnv } from "../server/hosted";
 import Stripe from "stripe";
@@ -266,6 +267,7 @@ describe("atomic quotas", () => {
 it("allows a new checkout lease after a completely canceled subscription", async () => {
   await user();
   env.STRIPE_SECRET_KEY = "sk_test_fixture_only";
+  env.STRIPE_MODE = "test";
   await env.DB.prepare("UPDATE users SET customer_id=? WHERE id=?")
     .bind("cus_owner", "user1")
     .run();
@@ -294,4 +296,138 @@ it("allows a new checkout lease after a completely canceled subscription", async
     expect(lease.idempotencyKey).not.toBe("old-key");
     return null;
   });
+});
+
+describe("deployment Stripe mode", () => {
+  function configured(mode: string | undefined, key: string): HostedEnv {
+    return {
+      ...env,
+      STRIPE_MODE: mode,
+      STRIPE_SECRET_KEY: key,
+      STRIPE_PRICE_ID: "price_fixture",
+      STRIPE_WEBHOOK_SECRET: "whsec_fixture",
+      TYPESAFE_API_KEY: "fixture",
+      BILLING_ENABLED: "true",
+    };
+  }
+  it.each([
+    ["live", "sk_live_fixture", true],
+    ["live", "rk_live_fixture", true],
+    ["test", "sk_test_fixture", true],
+    ["test", "rk_test_fixture", true],
+    ["live", "sk_test_fixture", false],
+    ["test", "sk_live_fixture", false],
+    [undefined, "sk_live_fixture", false],
+    ["invalid", "sk_live_fixture", false],
+    ["live", "pk_live_fixture", false],
+    ["live", "", false],
+  ])("mode %s with %s gives ready=%s", (mode, key, ready) => {
+    expect(billingReady(configured(mode, key))).toBe(ready);
+  });
+  it("blocks checkout and cached paid access when a test key reaches production", async () => {
+    const { cookie } = await user();
+    env = configured("live", "sk_test_fixture");
+    await env.DB.prepare(
+      "UPDATE users SET customer_id=?,recovery_confirmed=1 WHERE id=?",
+    )
+      .bind("cus_fixture", "user1")
+      .run();
+    await env.DB.prepare(
+      "INSERT INTO entitlements(user_id,active,checked_at) VALUES(?,?,?)",
+    )
+      .bind("user1", 1, Math.floor(Date.now() / 1000))
+      .run();
+    expect(
+      (await handleHostedApi(req("billing/checkout", {}, cookie), env)).status,
+    ).toBe(503);
+    const status = await handleHostedApi(
+      new Request(origin + "/api/jev/status", { headers: { cookie } }),
+      env,
+    );
+    expect(await status.json()).toMatchObject({
+      billingReady: false,
+      subscribed: false,
+      configured: false,
+    });
+  });
+  it.each([
+    ["test", "price_fixture", "cus_fixture"],
+    ["live", "price_old", "cus_fixture"],
+    ["live", "price_fixture", "cus_previous"],
+    null,
+  ])(
+    "revalidates cached access from another scope or an older schema",
+    async (...parts) => {
+      const { cookie } = await user();
+      env = configured("live", "sk_live_fixture");
+      await env.DB.prepare("UPDATE users SET customer_id=? WHERE id=?")
+        .bind("cus_fixture", "user1")
+        .run();
+      const previousScope = parts[0] === null ? null : JSON.stringify(parts);
+      await env.DB.prepare(
+        "INSERT INTO entitlements(user_id,active,checked_at,scope) VALUES(?,?,?,?)",
+      )
+        .bind("user1", 1, Math.floor(Date.now() / 1000), previousScope)
+        .run();
+      const transport = vi.fn(async () =>
+        Response.json({ object: "list", data: [], has_more: false }),
+      );
+      vi.spyOn(Stripe, "createFetchHttpClient").mockReturnValue(
+        Stripe.createFetchHttpClient(transport),
+      );
+      const getStatus = () =>
+        handleHostedApi(
+          new Request(origin + "/api/jev/status", { headers: { cookie } }),
+          env,
+        );
+      expect(await (await getStatus()).json()).toMatchObject({
+        subscribed: false,
+        configured: false,
+      });
+      expect(transport).toHaveBeenCalledTimes(1);
+      // Matching scope reuses the newly verified negative result.
+      expect(await (await getStatus()).json()).toMatchObject({
+        subscribed: false,
+      });
+      expect(transport).toHaveBeenCalledTimes(1);
+    },
+  );
+  it.each([
+    ["test", "sk_test_fixture", false, 200],
+    ["test", "sk_test_fixture", true, 400],
+    ["live", "sk_live_fixture", false, 400],
+    ["live", "sk_live_fixture", true, 200],
+    ["live", "sk_test_fixture", false, 503],
+  ])(
+    "accepts only signed events matching the deployment mode",
+    async (mode, key, live, status) => {
+      env = configured(mode, key);
+      // Webhooks remain available during a billing-disabled rollout.
+      env.BILLING_ENABLED = "false";
+      const payload = JSON.stringify({
+        id: "evt_fixture",
+        type: "customer.subscription.updated",
+        livemode: live,
+        data: { object: { customer: "cus_fixture" } },
+      });
+      const signature = new Stripe(key).webhooks.generateTestHeaderString({
+        payload,
+        secret: env.STRIPE_WEBHOOK_SECRET!,
+      });
+      const response = await handleHostedApi(
+        new Request(origin + "/api/billing/webhook", {
+          method: "POST",
+          headers: { "stripe-signature": signature },
+          body: payload,
+        }),
+        env,
+      );
+      expect(response.status).toBe(status);
+      expect(
+        store.sqlite
+          .prepare("SELECT count(*) AS count FROM billing_events")
+          .get(),
+      ).toMatchObject({ count: status === 200 ? 1 : 0 });
+    },
+  );
 });

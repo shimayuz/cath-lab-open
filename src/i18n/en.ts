@@ -1,5 +1,6 @@
 import type { MessageKey } from "./ja";
 export const en = {
+  お問い合わせ: "Contact support",
   "この端末のパスキーを追加し、最後に発行された復旧コードを保存してください。":
     "Add a passkey for this device and save the most recently issued recovery code.",
   "復旧コードが未確認です。新しいコードを発行して保存してください。":

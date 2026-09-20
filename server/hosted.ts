@@ -16,6 +16,7 @@ export interface HostedEnv {
   DB: D1Database;
   APP_ORIGIN: string;
   STRIPE_SECRET_KEY?: string;
+  STRIPE_MODE?: string;
   STRIPE_PRICE_ID?: string;
   STRIPE_WEBHOOK_SECRET?: string;
   TYPESAFE_API_KEY?: string;
@@ -24,18 +25,25 @@ export interface HostedEnv {
 }
 const now = () => Math.floor(Date.now() / 1000);
 const month = () => new Date().toISOString().slice(0, 7);
+function stripeModeMatches(env: HostedEnv) {
+  if (env.STRIPE_MODE === "live")
+    return /^(sk|rk)_live_/.test(env.STRIPE_SECRET_KEY ?? "");
+  if (env.STRIPE_MODE === "test")
+    return /^(sk|rk)_test_/.test(env.STRIPE_SECRET_KEY ?? "");
+  return false;
+}
 export function billingReady(env: HostedEnv) {
   return (
     env.BILLING_ENABLED === "true" &&
-    !!env.STRIPE_SECRET_KEY &&
+    stripeModeMatches(env) &&
     !!env.STRIPE_PRICE_ID &&
     !!env.STRIPE_WEBHOOK_SECRET &&
     !!env.TYPESAFE_API_KEY
   );
 }
 function stripeClient(env: HostedEnv) {
-  if (!env.STRIPE_SECRET_KEY) throw Error("billing-not-configured");
-  return new Stripe(env.STRIPE_SECRET_KEY, {
+  if (!stripeModeMatches(env)) throw Error("billing-not-configured");
+  return new Stripe(env.STRIPE_SECRET_KEY!, {
     httpClient: Stripe.createFetchHttpClient(),
     timeout: 5000,
     maxNetworkRetries: 1,
@@ -45,7 +53,7 @@ function billing(env: HostedEnv) {
   return new SubscriptionBilling(stripeClient(env), {
     priceId: env.STRIPE_PRICE_ID ?? "",
     origin: env.APP_ORIGIN,
-    live: /^(sk|rk)_live_/.test(env.STRIPE_SECRET_KEY ?? ""),
+    live: env.STRIPE_MODE === "live",
   });
 }
 function identity(user: Account): PaidIdentity {
@@ -54,18 +62,23 @@ function identity(user: Account): PaidIdentity {
 }
 async function entitled(user: Account, env: HostedEnv, force = false) {
   if (!billingReady(env) || !user.customer_id) return false;
+  const scope = JSON.stringify([
+    env.STRIPE_MODE,
+    env.STRIPE_PRICE_ID,
+    user.customer_id,
+  ]);
   const cached = await env.DB.prepare(
-    "SELECT active,checked_at FROM entitlements WHERE user_id=?",
+    "SELECT active,checked_at,scope FROM entitlements WHERE user_id=?",
   )
     .bind(user.id)
-    .first<{ active: number; checked_at: number }>();
-  if (!force && cached && cached.checked_at > now() - 15)
+    .first<{ active: number; checked_at: number; scope: string | null }>();
+  if (!force && cached?.scope === scope && cached.checked_at > now() - 15)
     return !!cached.active;
   const active = await billing(env).active(identity(user));
   await env.DB.prepare(
-    "INSERT INTO entitlements(user_id,active,checked_at) VALUES(?,?,?) ON CONFLICT(user_id) DO UPDATE SET active=excluded.active,checked_at=excluded.checked_at",
+    "INSERT INTO entitlements(user_id,active,checked_at,scope) VALUES(?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET active=excluded.active,checked_at=excluded.checked_at,scope=excluded.scope",
   )
-    .bind(user.id, active ? 1 : 0, now())
+    .bind(user.id, active ? 1 : 0, now(), scope)
     .run();
   return active;
 }
@@ -189,7 +202,8 @@ export async function reserveJevUsage(env: HostedEnv, userId: string) {
 }
 async function webhook(request: Request, env: HostedEnv) {
   if (request.method !== "POST") return json({ code: "method" }, 405);
-  if (!env.STRIPE_WEBHOOK_SECRET) return json({ code: "unavailable" }, 503);
+  if (!env.STRIPE_WEBHOOK_SECRET || !stripeModeMatches(env))
+    return json({ code: "unavailable" }, 503);
   const signature = request.headers.get("stripe-signature");
   if (!signature) return json({ code: "invalid-signature" }, 400);
   // Bound before parsing without changing the original signed bytes.
@@ -229,7 +243,7 @@ async function webhook(request: Request, env: HostedEnv) {
   } catch {
     return json({ code: "invalid-signature" }, 400);
   }
-  if (event.livemode !== /^(sk|rk)_live_/.test(env.STRIPE_SECRET_KEY ?? ""))
+  if (event.livemode !== (env.STRIPE_MODE === "live"))
     return json({ code: "wrong-mode" }, 400);
   const object = event.data.object as unknown as {
     customer?: string | { id: string };

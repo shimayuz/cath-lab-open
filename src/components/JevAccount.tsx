@@ -288,6 +288,9 @@ export function JevAccount({ jev }: { jev: ReturnType<typeof useJevAssist> }) {
         )}
       </p>
       {busy && <p role="status">{t("処理しています…")}</p>}
+      <p>
+        <a href="mailto:request@quai-inc.com">{t("お問い合わせ")}</a>
+      </p>
       {error && <p role="alert">{errorText}</p>}
     </section>
   );

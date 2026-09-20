@@ -1,9 +1,12 @@
 import { DatabaseSync } from "node:sqlite";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import type { D1Database } from "@cloudflare/workers-types";
 export function testDatabase() {
   const sqlite = new DatabaseSync(":memory:");
-  sqlite.exec(readFileSync("migrations/0001_accounts.sql", "utf8"));
+  for (const file of readdirSync("migrations")
+    .filter((f) => f.endsWith(".sql"))
+    .sort())
+    sqlite.exec(readFileSync(`migrations/${file}`, "utf8"));
   class Statement {
     constructor(
       readonly sql: string,
