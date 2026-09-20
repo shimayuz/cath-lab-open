@@ -2,7 +2,7 @@
 
 Explore coronary catheter movements in 3D. A learning prototype for medical students and early-career trainees, built with GPT-6-Astra.
 
-[Product page](https://cath-lab.pages.dev) · [日本語](https://cath-lab.pages.dev/?lang=ja)
+[Open simulator](https://cath-lab.pages.dev) · [日本語](https://cath-lab.pages.dev/?lang=ja) · [About](https://cath-lab.pages.dev/about/)
 
 ## What you can explore
 
@@ -38,9 +38,11 @@ The E2E suite uses an installed Chrome browser and downloads a public MediaPipe 
 
 ## Jev and pricing
 
-**Free:** local core simulator, hand controls, graphs and exports.
+**Free:** the complete browser simulator, local camera hand controls, graphs and exports. No account is needed. The public root serves the simulator; the separate product page lives at `/about/`.
 
-**Jev Pro (planned): USD $5/month through Stripe** for the operator-hosted Jev API. **Subscriptions are not open; no hosted paid Jev service is currently available.** Authentication, durable account mapping/quota, production payment setup, and commercial data clearance must be completed before selling access. See [billing implementation status](launch/BILLING.md).
+**Jev Pro: USD $5/month through Stripe**, only for the operator-hosted Jev feature. An active, paid subscription enables the Jev toggle. A free account or a client-side flag cannot enable the API. Passkey sign-in, recovery codes, durable account mapping, atomic usage limits and server-side payment checks are implemented. The included allowance is 50,000 intent requests per UTC month with no overage charge.
+
+**Live checkout remains disabled until the operator connects Stripe and completes payment setup/testing.** The simulator remains fully usable during this setup. See [hosted setup and billing status](launch/BILLING.md).
 
 For local development, you may bring your own TypeSafe API key in `.env.local` (copy `.env.example`). This sends hand movement summaries, not camera frames, to TypeSafe when Jev is explicitly enabled. Provider fees are your responsibility. Self-hosting does not grant access to our hosted API. Never use a `VITE_` prefix for a secret key. The existing Vite Jev endpoint deliberately accepts loopback traffic only; do not expose it as a production service.
 
@@ -52,6 +54,6 @@ Original application code is MIT-licensed; **vascular data and third-party softw
 
 ## 日本語
 
-医学生・若手研修医が、カテーテルの押し引き・回転と冠動脈への経路を体験するための研究・開発用プロトタイプです。画面で日本語／英語を切り替えられます。基本機能はローカルで無料利用できます。運営側のJev APIは月額5ドルの有料プランとして準備中で、現在は契約・請求できません。コードの公開は、運営者のAPIキーや有料サービスの利用権の提供を意味しません。
+医学生・若手研修医が、カテーテルの押し引き・回転と冠動脈への経路を体験するための研究・開発用プロトタイプです。画面で日本語／英語を切り替えられます。公開サイトで基本シミュレーターをログイン不要・無料で利用できます。Jevだけを月額5ドルの契約者がONにできる構成です。認証・利用権の仕組みは実装済みですが、Stripe本番接続が完了するまで契約・請求は無効です。コードの公開は、運営者のAPIキーや有料サービスの利用権の提供を意味しません。
 
 臨床的な妥当性、実手技の技能評価、Jevによる精度向上は未実証です。血管データには研究・開発目的の利用条件があります。有料版への使用可否を確認するまで商用サービスとして提供しません。

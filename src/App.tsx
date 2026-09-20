@@ -258,6 +258,7 @@ export default function App() {
           </span>
         </nav>
         <div className="header-actions">
+          <a className="help-button" href="#jev-access">Jev Pro</a>
           <div className="language-switch" role="group" aria-label={t("言語")}>
             <button
               type="button"

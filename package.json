@@ -10,10 +10,14 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "prepare:test": "node scripts/prepare-test.mjs",
-    "jev:check": "node scripts/check-jev.mts"
+    "jev:check": "node scripts/check-jev.mts",
+    "build:hosted": "npm run build && node scripts/build-hosted.mjs",
+    "dev:hosted": "wrangler pages dev dist --port 4198 --binding APP_ORIGIN=http://localhost:4198"
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "0.10.32",
+    "@simplewebauthn/browser": "14.0.0",
+    "@simplewebauthn/server": "14.0.2",
     "@typesafe-ai/sdk": "0.6.0",
     "lucide-react": "1.43.0",
     "react": "19.2.8",
@@ -22,6 +26,7 @@
     "three": "0.186.0"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "5.20260919.1",
     "@playwright/test": "1.63.0",
     "@types/node": "26.5.0",
     "@types/react": "19.2.18",
@@ -31,6 +36,7 @@
     "prettier": "3.9.6",
     "typescript": "7.0.2",
     "vite": "8.2.2",
-    "vitest": "5.0.0"
+    "vitest": "5.0.0",
+    "wrangler": "4.135.0"
   }
 }

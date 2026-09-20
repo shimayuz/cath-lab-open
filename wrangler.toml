@@ -1,0 +1,26 @@
+name = "cath-lab"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-09-19"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+APP_ORIGIN = "https://cath-lab.pages.dev"
+BILLING_ENABLED = "false"
+JEV_MONTHLY_LIMIT = "50000"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "cath-lab-accounts"
+database_id = "284f0330-6586-4527-90db-1c84f0cdc17f"
+migrations_dir = "migrations"
+
+[env.production.vars]
+APP_ORIGIN = "https://cath-lab.pages.dev"
+BILLING_ENABLED = "false"
+JEV_MONTHLY_LIMIT = "50000"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "cath-lab-accounts"
+database_id = "284f0330-6586-4527-90db-1c84f0cdc17f"
+migrations_dir = "migrations"

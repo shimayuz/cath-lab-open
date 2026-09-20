@@ -115,6 +115,13 @@ export class JevAssist {
       body: JSON.stringify({ id, instrument, recent: this.history }),
     })
       .then(async (response) => {
+        if (
+          [401, 402].includes(response.status) &&
+          typeof window !== "undefined"
+        ) {
+          this.setEnabled(false);
+          window.dispatchEvent(new Event("cath-subscription-recheck"));
+        }
         if (!response.ok) throw new Error("jev-unavailable");
         const result: unknown = await response.json();
         if (!isJevResult(result) || result.id !== id)

@@ -1,3 +1,4 @@
+import { JevAccount } from "./JevAccount";
 import { useI18n } from "../i18n/I18n";
 import type { useJevAssist } from "../hand/useJevAssist";
 export function JevPanel({
@@ -20,7 +21,8 @@ export function JevPanel({
     fallback: t("Jevに接続できないため、手元の処理を継続"),
   };
   return (
-    <div className="jev-panel">
+    <div className="jev-panel" id="jev-access">
+      <JevAccount jev={jev} />
       <label>
         {t("反応速度")}
         <select
@@ -60,7 +62,9 @@ export function JevPanel({
           ? status[jev.status.state]
           : jev.connection === "checking"
             ? t("Jev接続設定を確認中")
-            : t("この端末でJevの接続設定が必要です")}
+            : jev.connection === "locked"
+              ? t("Jevは有効な契約がある方のみONにできます")
+              : t("この端末でJevの接続設定が必要です")}
         {jev.enabled && jev.status.latencyMs !== null && (
           <span> · {t("応答 {0} ms", jev.status.latencyMs)}</span>
         )}

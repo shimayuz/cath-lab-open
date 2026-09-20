@@ -2,7 +2,12 @@
   "compilerOptions": {
     "target": "ES2022",
     "useDefineForClassFields": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable", "WebWorker"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable",
+      "WebWorker"
+    ],
     "module": "ESNext",
     "skipLibCheck": true,
     "moduleResolution": "bundler",
@@ -16,7 +21,17 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "types": ["vite/client", "node"]
+    "types": [
+      "vite/client",
+      "node"
+    ]
   },
-  "include": ["src", "server", "tests", "vite.config.ts", "playwright.config.ts"]
+  "include": [
+    "src",
+    "server",
+    "tests",
+    "vite.config.ts",
+    "playwright.config.ts",
+    "functions"
+  ]
 }

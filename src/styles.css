@@ -2431,3 +2431,18 @@ dialog.image-lightbox {
   line-height: 1.5;
   color: #607780;
 }
+
+/* Paid access lives within the optional Jev controls, never over the simulator. */
+.jev-account { padding:16px; border:1px solid var(--line, #cbdde1); border-radius:12px; background:#f5fbfb; margin-bottom:14px; scroll-margin-top:20px; }
+.jev-account-title { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; color:#126c70; }
+.jev-account-actions { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0; }
+.jev-account button { min-height:38px; border:1px solid #8eafb8; background:white; color:#24414d; border-radius:7px; padding:7px 11px; cursor:pointer; font:inherit; font-size:12px; }
+.jev-account button:disabled { opacity:.55; cursor:not-allowed; }
+.jev-account button:focus-visible,.jev-account input:focus-visible { outline:3px solid #087e83; outline-offset:3px; }
+.jev-account p { line-height:1.7; margin:10px 0; }
+.jev-account input { max-width:100%; width:100%; min-height:40px; margin:8px 0; }
+.jev-account .recovery-code { border:1px solid #c98b32; padding:12px; border-radius:8px; background:#fff9e9; }
+.recovery-code code { display:block; overflow-wrap:anywhere; user-select:all; margin:12px 0; }
+.jev-plan-terms { font-size:11px; color:#506a76; }
+.jev-account [role=alert] { color:#aa3030; }
+#jev-access {scroll-margin-top:25px}

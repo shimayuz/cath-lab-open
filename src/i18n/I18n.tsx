@@ -18,7 +18,10 @@ const Context = createContext<I18n | null>(null);
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocale] = useState<Locale>(() => {
     try {
-      return readLocale(window.localStorage);
+      const requested = new URLSearchParams(window.location.search).get("lang");
+      return requested === "en" || requested === "ja"
+        ? requested
+        : readLocale(window.localStorage);
     } catch {
       return "ja";
     }

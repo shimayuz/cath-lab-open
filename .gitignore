@@ -12,3 +12,8 @@ preview-*.png
 !.env.example
 *.zip
 *.ziptmp
+
+# Cloudflare local state and secrets
+.wrangler/
+.dev.vars
+.dev.vars.*

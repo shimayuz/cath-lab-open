@@ -1,36 +1,49 @@
-# Jev Pro: billing implementation status
+# Hosted simulator and Jev Pro
 
-Decision (2026-09-20): public GitHub source; hosted Jev API restricted to USD 5/month subscribers; Stripe billing; Product Hunt copy credits development with GPT-6-Astra. The free local simulator remains usable without Jev.
+Decision (2026-09-20): the public root keeps the complete simulator. 3D, fluoroscopy, manual controls, local MediaPipe hand controls and measurement exports are free without an account. Only hosted Jev requires a paid USD 5/month Stripe subscription. `/about/` is a separate product page.
 
-## Implemented, not live
+## Implemented
 
-`server/subscription.ts` supplies server-only primitives:
+- Cloudflare Pages Functions `/api/*`, D1 accounts and server-side sessions; static simulator assets bypass the API.
+- Passkeys with user verification, browser-bound single-use challenges, hashed HttpOnly sessions, recovery codes and generation-based revocation. Save the recovery code privately. Account recovery adds a new passkey and confirms the exact new code before invalidating the old recovery code.
+- Server-owned account → Stripe customer mapping. Checkout is serialized in D1 with persistent idempotency/session reuse; duplicates are refused. The customer portal manages cancellation/payment details.
+- Authoritative Stripe subscription/invoice checks: matching customer, configured USD 500 monthly price and test/live mode, active automatic collection, paid latest invoice, unexpired paid period. Trials/unpaid/past-due/paused subscriptions do not unlock Jev. Period-end cancellation retains paid access until expiry.
+- Signed webhook validation and event deduplication. Events invalidate the brief entitlement cache; current Stripe state determines access. No client-supplied customer or paid flag can grant access.
+- Atomic allowance: 50,000 requests per UTC calendar month, 4 requests/second/account, 900/minute globally and 1,000,000/month globally. No overage billing. Failed global reservations do not consume the user's allowance.
+- Jev only receives movement summaries after explicit ON, never camera frames. Auth/payment/API errors keep ordinary hand controls working.
 
-- Check Stripe's authoritative active subscription, customer ownership, configured price ID, live/test mode, USD 500 cents, monthly interval unexpired period, automatic collection and a paid latest invoice.
-- Reject incomplete, trialing, past-due, unpaid, canceled and paused subscriptions.
-- Let cancellation at period end retain access until the paid period expires.
-- Checkout uses only the server-configured price/customer, through a required serialized durable lease with session reuse and an idempotency key; portal supports subscription management.
-- Verify webhook signatures with Stripe's SDK and the original request body.
-- Paid Jev request boundary authenticates first, checks access, validates and bounds input, reserves usage, then calls Jev. Client paid/customer flags cannot grant access. Auth/billing failures deny access.
+## Current activation status
 
-These helpers are **not mounted to a public API**. The product page has no purchase button. The local Vite gateway remains loopback-only. A static product page cannot enforce subscriptions by itself.
+The free hosted simulator is the primary site. `BILLING_ENABLED=false` keeps actual checkout and hosted Jev closed while Stripe credentials and live payment configuration are unavailable. Account creation and local/free operation remain available. The UI states the connection status; it must not claim that payment is active.
 
-## Remaining before any charge
+Production payment/renewal/cancellation have not been exercised against a real Stripe account. Unit tests use Stripe transport fixtures; local hosted browser tests use real WebAuthn verification with a virtual authenticator. They do not prove live billing or real-hand accuracy.
 
-1. Configure a production account/login flow and durable server-owned user → Stripe customer mapping. The authenticate callback must verify the session; never accept a client customer ID. Provide account recovery and deletion paths.
-2. Add same-origin, authenticated Checkout and portal routes, serialize checkout per account, and reuse open sessions to prevent duplicate subscriptions. Reserve a stable idempotency key server-side.
-3. Persist webhook event IDs idempotently. Handle invoice payment failures and subscription lifecycle updates. Reconcile using Stripe's current subscription rather than applying events out of order. Bound request sizes and timeouts at the HTTP server.
-4. Implement atomic per-account and global usage reservations and provider budget/rate limits. Choose and disclose the included allowance before selling. Do not promise unlimited usage. Current published Jev input price is $0.042/M tokens, output free; token volume and hosting/payment costs remain to be measured.
-5. Configure server-only `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `STRIPE_WEBHOOK_SECRET` and `TYPESAFE_API_KEY`. Do not put them in browser bundles, repository files, logs or chat. Stored Stripe CLI authorization was expired during setup.
-6. Resolve research-only vascular data use for paid hosting or replace the anatomy with an independently created commercial-use model.
-7. Publish merchant identity/contact, privacy, cancellation/refund and applicable tax disclosures using verified business details. No merchant identity or refund promise has been invented in the product page.
-8. Test Stripe test-mode checkout, required authentication, successful renewal, failed payment, cancellation, forged webhook, replayed event, duplicate checkout and revoked access end-to-end before enabling live sales.
+## Operator setup
 
-## Sources
+Requires Node 22.22+, Git LFS, a Cloudflare account and Stripe access. Keep all secrets in provider secret storage, never `VITE_` variables, chat or source control.
 
-- https://docs.stripe.com/api/subscriptions/list
-- https://docs.stripe.com/billing/subscriptions/webhooks
-- https://docs.stripe.com/webhooks/signature
-- https://docs.typesafe.ai/models
+1. Create a D1 database and set its ID in `wrangler.toml`; use your own `APP_ORIGIN` in both default and production vars. Set `BILLING_ENABLED=false` initially.
+2. Apply `npx wrangler d1 migrations apply cath-lab-accounts --remote`.
+3. Create a Stripe USD 5 monthly recurring price. Configure the Stripe customer portal. Create a signed webhook at `https://YOUR_ORIGIN/api/billing/webhook` for subscription and invoice lifecycle events, plus completed/expired Checkout events. Use separate test and live keys/prices/webhook secrets.
+4. Add Pages secrets: `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `STRIPE_WEBHOOK_SECRET`, `TYPESAFE_API_KEY`, using `npx wrangler pages secret put NAME --project-name cath-lab` or the dashboard.
+5. Test in a separate Stripe test-mode deployment: successful Checkout, return/sign-in, Jev ON, renewal, payment failure, cancellation, duplicate Checkout, account recovery and webhook replay. Never enter real payment cards in automated tests.
+6. Confirm business/contact, cancellation/refund, tax and data-use terms before collecting live payments. The included VMR anatomy has separate research/development terms; commercial hosting clearance has not been established. See `NOTICE.md`.
+7. Set `BILLING_ENABLED=true` only after the appropriate configuration and tests; build and deploy `dist`, **not** `site`:
 
-The primitives' unit tests are not evidence that checkout, auth, production billing or Jev Pro is operational.
+```sh
+npm ci
+npm run build:hosted
+npx wrangler pages deploy dist --project-name cath-lab --branch main
+```
+
+Local hosted testing:
+
+```sh
+npx wrangler d1 migrations apply cath-lab-accounts --local
+npm run build:hosted
+npm run dev:hosted
+# another terminal
+CATH_TEST_ORIGIN=http://localhost:4198 npx playwright test tests/e2e/hosted.spec.ts
+```
+
+Local ordinary development continues to use `npm run dev` and optional `.env.local` BYOK. Its loopback-only API must not be exposed as a hosted subscription gateway. Database migrations are append-only after deployment. Preserve D1 backups and recovery procedures; do not log tokens or recovery codes.

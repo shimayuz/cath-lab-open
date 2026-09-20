@@ -141,8 +141,8 @@ export class SubscriptionBilling {
             customer: identity.customerId,
             client_reference_id: identity.userId,
             line_items: [{ price: this.config.priceId, quantity: 1 }],
-            success_url: `${this.config.origin}/account?checkout=complete`,
-            cancel_url: `${this.config.origin}/account?checkout=cancelled`,
+            success_url: `${this.config.origin}/?billing=complete`,
+            cancel_url: `${this.config.origin}/?billing=cancelled`,
             subscription_data: { metadata: { userId: identity.userId } },
           },
           { idempotencyKey: lease.idempotencyKey },
@@ -155,7 +155,7 @@ export class SubscriptionBilling {
   async portal(identity: PaidIdentity) {
     return this.stripe.billingPortal.sessions.create({
       customer: identity.customerId,
-      return_url: `${this.config.origin}/account`,
+      return_url: `${this.config.origin}/`,
     });
   }
   webhook(raw: string | Buffer, signature: string, secret: string) {

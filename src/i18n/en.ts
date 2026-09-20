@@ -1,5 +1,63 @@
 import type { MessageKey } from "./ja";
 export const en = {
+  "この端末のパスキーを追加し、最後に発行された復旧コードを保存してください。":
+    "Add a passkey for this device and save the most recently issued recovery code.",
+  "復旧コードが未確認です。新しいコードを発行して保存してください。":
+    "Your recovery code is not confirmed. Generate and save a new code.",
+
+  "パスキーで再ログインしてから、もう一度お試しください。":
+    "Sign in again with your passkey, then try again.",
+  "復旧後は、この端末のパスキーを追加してから新しい復旧コードを保存してください。":
+    "After recovery, add a passkey for this device before saving the new recovery code.",
+  "復旧コードを保存済みなら確認してください。紛失した場合は、新しいコードを発行できます。":
+    "Confirm if you saved your recovery code. If it was lost, you can generate a new one.",
+  復旧コードを再発行: "Generate a new recovery code",
+
+  "Jev Proの契約": "Jev Pro subscription",
+  "月額5ドル（USD）": "$5/month USD",
+  "基本機能はログイン不要・無料です。Jevだけ、有効な契約がある方がONにできます。":
+    "The simulator is free, with no login required. Only Jev needs an active subscription to turn on.",
+  パスキーで登録: "Create account with a passkey",
+  パスキーでログイン: "Sign in with a passkey",
+  復旧コードでログイン: "Sign in with a recovery code",
+  復旧コード: "Recovery code",
+  アカウントを復旧: "Recover account",
+  "Jev Pro 契約中": "Jev Pro is active",
+  無料プランで利用中: "Using the free plan",
+  "今月のJev判定：{0} / {1}回": "Jev requests this month: {0} / {1}",
+  月額5ドルでJevを有効にする: "Enable Jev for $5/month",
+  "契約・支払いを管理": "Manage subscription and payments",
+  契約状態を更新: "Refresh subscription",
+  この端末のパスキーを追加: "Add a passkey for this device",
+  ログアウト: "Sign out",
+  復旧コードを保存してください: "Save your recovery code",
+  "パスキーを失った場合に必要です。一度しか表示しません。誰にも共有しないでください。":
+    "You need this if you lose your passkey. It is shown only once. Do not share it with anyone.",
+  復旧コードを保存: "Save recovery code",
+  "登録時の復旧コードを保存した場合は確認してください。未保存なら、契約前にアカウントを作り直してください。":
+    "Confirm if you saved your recovery code when registering. If not, create a new account before subscribing.",
+  復旧コードは保存済み: "I have saved my recovery code",
+  "Stripeの接続待ちです。基本シミュレーターは利用できます。":
+    "Stripe setup is pending. You can use the full core simulator.",
+  "月50,000回までのJev判定を含みます（UTC暦月）。追加請求なし。解約は契約管理から行えます。カメラ映像は送信しません。":
+    "Includes 50,000 Jev requests per UTC calendar month, with no overage charges. Cancel from subscription management. Camera frames are not sent.",
+  "処理しています…": "Working…",
+  Jevは有効な契約がある方のみONにできます:
+    "Only active subscribers can turn on Jev",
+  "契約が登録されています。「契約・支払いを管理」から確認してください。":
+    "A subscription already exists. Open Manage subscription and payments.",
+  "しばらく待ってから、もう一度お試しください。":
+    "Please wait a moment and try again.",
+  "復旧コードを確認してください。": "Check your recovery code.",
+  "復旧コードを保存してから契約へ進んでください。":
+    "Save your recovery code before subscribing.",
+  "決済の状態を確認しています。少し待って契約状態を更新してください。":
+    "The checkout is being reconciled. Wait a moment, then refresh your subscription.",
+  "パスキーに対応したブラウザでお試しください。":
+    "Please use a browser that supports passkeys.",
+  "操作を完了できませんでした。通信とパスキーを確認して、再度お試しください。":
+    "The action did not complete. Check your connection and passkey, then try again.",
+
   "回転はカテーテル、Push / Pullは選択中のデバイスを操作します。":
     "Rotation controls the catheter; Push / Pull controls the selected device.",
   回転入力の状態: "Rotation input status",
