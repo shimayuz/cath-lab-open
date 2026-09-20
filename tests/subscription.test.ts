@@ -218,6 +218,14 @@ it("reuses a checkout under a serialized durable-lease contract", async () => {
   ]);
   expect(results.map((x) => x.id)).toEqual(["cs_one", "cs_one"]);
   expect(create).toHaveBeenCalledTimes(1);
+  expect(create).toHaveBeenCalledWith(
+    expect.objectContaining({
+      mode: "subscription",
+      managed_payments: { enabled: false },
+      line_items: [{ price: config.priceId, quantity: 1 }],
+    }),
+    { idempotencyKey: "server-reserved-key" },
+  );
 });
 it("evaluates valid paid intent only after usage reservation; denies exhausted quota", async () => {
   const deps = dependencies();

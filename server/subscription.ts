@@ -138,6 +138,8 @@ export class SubscriptionBilling {
         const session = await this.stripe.checkout.sessions.create(
           {
             mode: "subscription",
+            // Use ordinary Checkout even when the account defaults to Managed Payments.
+            managed_payments: { enabled: false },
             customer: identity.customerId,
             client_reference_id: identity.userId,
             line_items: [{ price: this.config.priceId, quantity: 1 }],

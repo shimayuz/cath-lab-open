@@ -14,9 +14,11 @@ Decision (2026-09-20): the public root keeps the complete simulator. 3D, fluoros
 
 ## Current activation status
 
-The free hosted simulator is the primary site. `BILLING_ENABLED=false` keeps actual checkout and hosted Jev closed while Stripe credentials and live payment configuration are unavailable. Account creation and local/free operation remain available. The UI states the connection status; it must not claim that payment is active.
+The free hosted simulator is the primary site. Production keeps `BILLING_ENABLED=false`; sandbox credentials have been configured locally, while live payment configuration remains unavailable. Account creation and local/free operation remain available. The UI states the connection status; it must not claim that payment is active.
 
-Production payment/renewal/cancellation have not been exercised against a real Stripe account. Unit tests use Stripe transport fixtures; local hosted browser tests use real WebAuthn verification with a virtual authenticator. They do not prove live billing or real-hand accuracy.
+Sandbox verification (2026-09-20) used actual Stripe test-mode objects and the local hosted app: passkey registration/recovery confirmation, USD 5 hosted Checkout with a test card, duplicate prevention, paid Jev toggle and a successful Jev API response, portal-session creation, period-end cancellation retaining access, immediate cancellation revoking access through signed webhooks, repurchase, and free controls remaining available. Monthly renewal and unpaid states are tested separately with Stripe test clocks and the production entitlement function. These are sandbox results, not live sales or clinical/real-hand validation.
+
+The first paid Jev request timed out; a later full flow returned HTTP 200. Separate synthetic provider checks took 303–647 ms, including an answer outside the 500 ms live freshness limit. Do not interpret payment success as guaranteed real-time Jev performance. The local return URL used a development certificate and was blocked in the in-app browser; payment and account state were verified separately. A public HTTPS return and live lifecycle remain to be verified before sales.
 
 ## Operator setup
 
@@ -24,7 +26,7 @@ Requires Node 22.22+, Git LFS, a Cloudflare account and Stripe access. Keep all 
 
 1. Create a D1 database and set its ID in `wrangler.toml`; use your own `APP_ORIGIN` in both default and production vars. Set `BILLING_ENABLED=false` initially.
 2. Apply `npx wrangler d1 migrations apply cath-lab-accounts --remote`.
-3. Create a Stripe USD 5 monthly recurring price. Configure the Stripe customer portal. Create a signed webhook at `https://YOUR_ORIGIN/api/billing/webhook` for subscription and invoice lifecycle events, plus completed/expired Checkout events. Use separate test and live keys/prices/webhook secrets.
+3. Create a Stripe USD 5 monthly recurring price. This integration explicitly disables Managed Payments per Checkout session and uses ordinary Stripe Checkout, independent of the account default. Configure the Stripe customer portal. Create a signed webhook at `https://YOUR_ORIGIN/api/billing/webhook` for subscription and invoice lifecycle events, plus completed/expired Checkout events. Use separate test and live keys/prices/webhook secrets.
 4. Add Pages secrets: `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `STRIPE_WEBHOOK_SECRET`, `TYPESAFE_API_KEY`, using `npx wrangler pages secret put NAME --project-name cath-lab` or the dashboard.
 5. Test in a separate Stripe test-mode deployment: successful Checkout, return/sign-in, Jev ON, renewal, payment failure, cancellation, duplicate Checkout, account recovery and webhook replay. Never enter real payment cards in automated tests.
 6. Confirm business/contact, cancellation/refund, tax and data-use terms before collecting live payments. The included VMR anatomy has separate research/development terms; commercial hosting clearance has not been established. See `NOTICE.md`.
